@@ -2,6 +2,7 @@ async function get(){
 
     let number = getRandomNumber()
     let requestURL = "https://www.acmicpc.net/problem/" + number.toString()
+    getRandomNumber2()
 
     //rep = await fetch(requestURL, )
     const rep = await fetch(requestURL)
@@ -33,49 +34,34 @@ async function get(){
     return
     }
     
-/**
- * @brief get random number in range 1000 to 
- * 
- */
-function getRandomNumber(){
-    return Math.floor(Math.random() * (8000 - 1000) + 1000)
-}
+
 
 
 async function getFromLeetCode(){
+
+    let fetchingURL = "https://leetcode.com/api/problems/all/"
+    const fetchResponse = await fetch(fetchingURL)
+    const parsedFetchResponse = await fetchResponse.json()
+    const problemInfo = parsedFetchResponse.stat_status_pairs[getRandomNumber2()]
+
+    const titleSlug = problemInfo.stat.question__title_slug
     let requestURL = "https://leetcode.com/graphql"
-    body = JSON.stringify(getQuery({operation:"question", variables:{value:"contains-duplicate", type:"String!"},fields:["title"]})) 
-    alert(body)
-    const rep = await fetch(requestURL, {
-        method: "POST",
-        body:body
-    });
+    a = getQuery({operation:"question", variables:{titleSlug:{value:titleSlug, type:"String!"}},fields:["title", "content"]})
+    const response = await fetch(requestURL,{
+        method:'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body:JSON.stringify(a)
+    })
+    const parsed = await response.json()
+    document.querySelector('#result').innerHTML = parsed.data.question.content
 
-    if (rep.status == 404){
-        await getFromLeetCode();
-    } else {
-        const result = await rep.json();
-        
-        //var parser = new DOMParser();
-        //var doc = parser.parseFromString(result, "text/html");
-        //var text = doc.querySelector('#problem_description').innerText
-        //var title = doc.querySelector('#problem_title').innerText
-        //var acceptance = doc.querySelector("#problem-info").getElementsByTagName('tr')[1].getElementsByTagName('td')[5].innerText
-
-        document.querySelector('#result').innerText = result.stringify()
-        //document.querySelector('#title').innerText = title
-        //document.querySelector('#number').innerText = number.toString()
-        //document.querySelector('#acceptance').innerText = acceptance
-
-        
-        /*document.querySelector('#gobutton').onclick = function(){
-            chrome.tabs.executeScript({
-                code: "location.replace('" + requestURL + "')"
-              });    
-        }*/
-    }
 
 }
+
+
+
 function getQuery(query) {
     /**
      *  "operation" : "question"
@@ -101,22 +87,37 @@ function fieldProcessing(fieldlist){
     },"")
 }
 
+//{"variables":{"titleSlug":"contains-duplicate"},"query":"query question($titleSlug:String!) { question(titleSlug:$titleSlug){title}}"}
+//{"variables":{"titleSlug":"contains-duplicate"},"query":"query($titleSlug:String!){\nquestion(titleSlug:$titleSlug){\ntitle}\n}"}
 function variableProcessing(variables){
     return Object.keys(variables).reduce((prev, current) => {
-        prev[0] += "($" + variables[current]["value"] + ":" + variables[current]["type"] + ")"
-        prev[1] += "(" + variables[current]["value"] + ":" + "$" + variables[current]["value"] + ")"
+        prev[0] += "($" +current+ ":" + variables[current]["type"] + ")"
+        prev[1] += "(" + current + ":" + "$" + current + ")"
         prev[2][current] = variables[current]["value"]
         return prev
     }, ["","", {}])
 }
 
 function queryProcessing(operation, variableQuery,fieldQuery){
-    return "query" + variableQuery[0] + "{\n" + operation + variableQuery[1] + "{\n" + fieldQuery + "}\n}" 
+    return "query " + operation + variableQuery[0] + "{" + operation + variableQuery[1] + "{" + fieldQuery + "}}" 
 }
 
+
+
+
+/**
+ * @brief get random number in range 1000 to 
+ * 
+ */
+function getRandomNumber(){
+    return Math.floor(Math.random() * (8000 - 1000) + 1000)
+} // how to get total number of the
+
+function getRandomNumber2(){
+    return Math.floor(Math.random() * (1340 - 0))
+} // how to get total number of the
+
+//starts
+//need web rececving.
 document.addEventListener("DOMContentLoaded", function(){ getFromLeetCode() }, false);
-
-
-
-
 

@@ -1,7 +1,21 @@
+//geeksforgeeks
+//Hackerrank
+//codeforces.com
+//leetcode.com
+//acimp.com
+
+var app = angular.module("myApp", []);
+app.controller("myCtrl", function($scope) { 
+    $scope.test = "nld"
+    $scope.test2 = $scope.test
+
+});
+
+
 async function get(){
 
     let number = getRandomNumber()
-    let requestURL = "https://www.acmicpc.net/problem/" + number.toString()
+    let requestURL = "https://www.acmicpc.net/problem/1002" //+ number.toString()
     getRandomNumber2()
 
     //rep = await fetch(requestURL, )
@@ -13,15 +27,13 @@ async function get(){
         result = await rep.text();
         var parser = new DOMParser();
         var doc = parser.parseFromString(result, "text/html");
-        var text = doc.querySelector('#problem_description').innerText
+        var text = doc.querySelector('#problem_description').innerHTML //innerHTML
         var title = doc.querySelector('#problem_title').innerText
         var acceptance = doc.querySelector("#problem-info").getElementsByTagName('tr')[1].getElementsByTagName('td')[5].innerText
-
-        document.querySelector('#result').innerText = text
+        document.querySelector('#result').innerHTML = text
         document.querySelector('#title').innerText = title
         document.querySelector('#number').innerText = number.toString()
         document.querySelector('#acceptance').innerText = acceptance
-
         
         document.querySelector('#gobutton').onclick = function(){
             chrome.tabs.executeScript({
